@@ -118,10 +118,10 @@ export const BarMenu = () => {
 
 const COLORS = [
   "oklch(92.4% 0.12 95.746)",
+  "oklch(77.7% 0.152 181.912)",
   "oklch(80.8% 0.114 19.571)",
   "oklch(86.5% 0.127 207.078)",
   "oklch(71.4% 0.203 305.504)",
-  "oklch(77.7% 0.152 181.912)",
 ];
 
 const TabPayButton = ({
