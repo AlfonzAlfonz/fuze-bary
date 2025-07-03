@@ -16,7 +16,14 @@ type TableRow = [
 export const usePriceData = () => {
   return useQuery({
     queryKey: ["price-data"],
-    queryFn: async () => {
+    networkMode: "always",
+    queryFn: async (): Promise<Record<string, Item>> => {
+      const persisted = localStorage.getItem("ceny");
+
+      if (!navigator.onLine && persisted !== null) {
+        return JSON.parse(persisted);
+      }
+
       const file = await supabase.storage.from("data").download("ceny.csv");
 
       if (file.error) throw file.error;
@@ -50,7 +57,11 @@ export const usePriceData = () => {
         }
       }
 
-      return Object.fromEntries(result);
+      const ceny = Object.fromEntries(result);
+
+      localStorage.setItem("ceny", JSON.stringify(ceny));
+
+      return ceny;
     },
   });
 };

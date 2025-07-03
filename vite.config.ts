@@ -7,9 +7,9 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       injectRegister: "auto",
-      devOptions: {
-        enabled: true,
-      },
+      // devOptions: {
+      //   enabled: true,
+      // },
       // add this to cache all the imports
       workbox: {
         globPatterns: ["**/*"],

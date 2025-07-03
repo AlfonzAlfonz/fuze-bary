@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
-import { useStore } from "./store/useStore";
 import type { OrderItem } from "./types";
 import { usePriceData } from "./usePriceData";
 import { useSnackbar } from "./Snackbars";
+import { useStore } from "./store/db";
 
 export const useApplication = () => {
   const openSnackbar = useSnackbar();
 
-  const [store] = useStore();
+  const store = useStore();
 
   const priceData = usePriceData();
 
@@ -48,7 +48,7 @@ export const useApplication = () => {
             )
             .filter((itm) => itm.amount)
         ),
-      submitOrder: async (method: "cash" | "card") => {
+      submitOrder: async (method: "cash" | "card" | `tab_${number}`) => {
         const now = new Date().toISOString();
 
         setLoading(true);
@@ -67,7 +67,7 @@ export const useApplication = () => {
             })
           );
           setOrder([]);
-          openSnackbar("success", "Uloženo");
+          openSnackbar("success", "Ůloženo");
         } catch (e) {
           openSnackbar("error", e instanceof Error ? e.message : String(e));
         } finally {

@@ -11,10 +11,16 @@ export type OrderItem = {
 };
 
 export type Transaction = {
+  id: number;
   itemId: string;
   name: string;
   amount: number;
   price: number;
   createdAt: string;
-  method: "cash" | "card";
+  method: "cash" | "card" | `tab_${number}`;
+};
+
+export type Tab = {
+  id: number;
+  name: string;
 };
