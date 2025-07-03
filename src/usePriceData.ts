@@ -17,10 +17,17 @@ export const usePriceData = () => {
   return useQuery({
     queryKey: ["price-data"],
     networkMode: "always",
+    gcTime: 0,
     queryFn: async (): Promise<Record<string, Item>> => {
       const persisted = localStorage.getItem("ceny");
 
-      if (!navigator.onLine && persisted !== null) {
+      const isOnline = await fetch("https://platform.signageos.io/ping", {
+        method: "HEAD",
+      })
+        .then(() => true)
+        .catch(() => false);
+
+      if (!isOnline && persisted !== null) {
         return JSON.parse(persisted);
       }
 
