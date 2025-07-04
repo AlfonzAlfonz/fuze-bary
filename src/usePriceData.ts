@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { parse } from "csv-parse/browser/esm/sync";
-import { supabase } from "./supabase";
-import type { Item } from "./types";
 import slugify from "slugify";
+import type { Item } from "./types";
 
 type TableRow = [
   name: string,
@@ -31,11 +30,20 @@ export const usePriceData = () => {
         return JSON.parse(persisted);
       }
 
-      const file = await supabase.storage.from("data").download("ceny.csv");
+      const url =
+        "https://hoyebsvzsgwoiivmgvvb.supabase.co/storage/v1/object/data/ceny.csv";
+
+      const file = await fetch(url + `?t=${Date.now()}`, {
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_TOKEN}`,
+        },
+      })
+        .then((r) => ({ data: r, error: null }))
+        .catch((e) => ({ data: null, error: e }));
 
       if (file.error) throw file.error;
 
-      const parsed = parse(await file.data.text(), {
+      const parsed = parse(await file.data!.text(), {
         delimiter: ",",
       }) as TableRow[];
 

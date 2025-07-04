@@ -62,7 +62,9 @@ export const BarMenu = () => {
                       key={i}
                       sx={{
                         backgroundColor:
-                          COLORS[colorIndexes!.indexOf(item.category)],
+                          COLORS[
+                            colorIndexes!.indexOf(item.category) % COLORS.length
+                          ],
                         color: "black",
                       }}
                     >

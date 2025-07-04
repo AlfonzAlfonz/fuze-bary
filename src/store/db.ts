@@ -43,9 +43,8 @@ export const createStore = async (epoch: string) => {
     readMethodTransactions: async (
       method: `tab_${number}`
     ): Promise<Transaction[]> => {
-      console.log({ method });
-      return (await db.getAllFromIndex("trans", "method", method)).filter(
-        (t) => t.epoch === epoch
+      return (await db.getAll("trans")).filter(
+        (t: Transaction) => t.method === method
       );
     },
 
