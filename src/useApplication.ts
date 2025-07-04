@@ -48,7 +48,10 @@ export const useApplication = () => {
             )
             .filter((itm) => itm.amount)
         ),
-      submitOrder: async (method: "cash" | "card" | `tab_${number}`) => {
+      submitOrder: async (
+        method: "cash" | "card" | `tab_${number}`,
+        multiplier: number
+      ) => {
         const now = new Date().toISOString();
 
         setLoading(true);
@@ -63,6 +66,7 @@ export const useApplication = () => {
                 name: item.name,
                 createdAt: now,
                 method,
+                multiplier,
               };
             })
           );

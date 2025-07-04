@@ -48,7 +48,18 @@ export const BarSettings = () => {
 const exportData = async (store: Store) => {
   const trans = await store.readAllTransactions();
 
-  const str = stringify(trans);
+  const str = stringify(trans, {
+    columns: [
+      "itemId",
+      "amount",
+      "price",
+      "name",
+      "createdAt",
+      "method",
+      "id",
+      "multiplier",
+    ],
+  });
 
   const filename = `${new Date().toISOString()}.csv`;
 

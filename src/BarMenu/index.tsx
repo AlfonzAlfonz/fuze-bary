@@ -19,6 +19,8 @@ import ToggleButton from "@mui/material/ToggleButton";
 import Grid from "@mui/material/Grid";
 import IconButton from "@mui/material/IconButton";
 import RemoveIcon from "@mui/icons-material/Remove";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 type PaymentState =
   | ["cash"]
@@ -42,6 +44,8 @@ export const BarMenu = () => {
 
   const categorisedPriceData =
     priceData.data && groupBy(Object.values(priceData.data), (x) => x.category);
+
+  const [crew, setCrew] = useState(false);
 
   return (
     <>
@@ -146,58 +150,69 @@ export const BarMenu = () => {
           </Stack>
         </Stack>
 
-        <Stack gap={2}>
-          {!!order.length && (
-            <Stack direction="row" justifyContent="space-between">
-              <Typography variant="h5">Celkem</Typography>
-              <Typography variant="h5">
-                {order.reduce(
-                  (acc, x) => acc + priceData.data![x.itemId].price * x.amount,
-                  0
-                )}{" "}
-                Kč
-              </Typography>
-            </Stack>
-          )}
-          <ToggleButtonGroup
-            color="primary"
-            value={paymentState?.[0]}
-            exclusive
-            onChange={(_, v) => setPaymentState([v])}
-          >
-            <ToggleButton value="cash">Hotově</ToggleButton>
-            <ToggleButton value="card">Kartou</ToggleButton>
-            <ToggleButton value="tab">
-              {data &&
-              paymentState &&
-              paymentState[0] === "tab" &&
-              paymentState[1] !== undefined
-                ? data.find((t) => t.id === paymentState[1])?.name
-                : "Ůčet"}
-            </ToggleButton>
-          </ToggleButtonGroup>
-          <Button
-            fullWidth
-            variant="contained"
-            disabled={
-              order.length === 0 ||
-              !paymentState ||
-              (paymentState[0] === "tab" ? paymentState.length === 1 : false)
-            }
-            onClick={() => {
-              if (!paymentState) return;
+        <Stack gap={1}>
+          <FormControlLabel
+            control={<Checkbox />}
+            label="Crew sleva (20%)"
+            value={crew}
+            onChange={(_, checked) => setCrew(checked)}
+          />
 
-              actions.submitOrder(
-                paymentState[0] === "tab"
-                  ? `tab_${paymentState[1]!}`
-                  : paymentState[0]
-              );
-              setPaymentState(undefined);
-            }}
-          >
-            Odeslat
-          </Button>
-          {orderSubmitting && <LinearProgress />}
+          <Stack gap={2}>
+            {!!order.length && (
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="h5">Celkem</Typography>
+                <Typography variant="h5">
+                  {order.reduce(
+                    (acc, x) =>
+                      acc + priceData.data![x.itemId].price * x.amount,
+                    0
+                  ) * (crew ? 0.8 : 1)}{" "}
+                  Kč
+                </Typography>
+              </Stack>
+            )}
+            <ToggleButtonGroup
+              color="primary"
+              value={paymentState?.[0]}
+              exclusive
+              onChange={(_, v) => setPaymentState([v])}
+            >
+              <ToggleButton value="cash">Hotově</ToggleButton>
+              <ToggleButton value="card">Kartou</ToggleButton>
+              <ToggleButton value="tab">
+                {data &&
+                paymentState &&
+                paymentState[0] === "tab" &&
+                paymentState[1] !== undefined
+                  ? data.find((t) => t.id === paymentState[1])?.name
+                  : "Ůčet"}
+              </ToggleButton>
+            </ToggleButtonGroup>
+            <Button
+              fullWidth
+              variant="contained"
+              disabled={
+                order.length === 0 ||
+                !paymentState ||
+                (paymentState[0] === "tab" ? paymentState.length === 1 : false)
+              }
+              onClick={() => {
+                if (!paymentState) return;
+
+                actions.submitOrder(
+                  paymentState[0] === "tab"
+                    ? `tab_${paymentState[1]!}`
+                    : paymentState[0],
+                  crew ? 0.8 : 1
+                );
+                setPaymentState(undefined);
+              }}
+            >
+              Odeslat
+            </Button>
+            {orderSubmitting && <LinearProgress />}
+          </Stack>
         </Stack>
       </Stack>
       <Dialog
