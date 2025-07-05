@@ -46,7 +46,7 @@ export const BarMenu = () => {
     priceData.data && groupBy(Object.values(priceData.data), (x) => x.category);
 
   const [crew, setCrew] = useState(false);
-
+  console.log(crew);
   return (
     <>
       <Stack gap={2} sx={{ flexGrow: 1 }}>
@@ -102,8 +102,8 @@ export const BarMenu = () => {
         gap={2}
         sx={{ flexGrow: 0, flexShrink: 0 }}
         pr={2}
-        height="96vh"
-        maxHeight="96vh"
+        height="93vh"
+        maxHeight="93vh"
         position="sticky"
         top={0}
         justifyContent="space-between"
@@ -152,10 +152,13 @@ export const BarMenu = () => {
 
         <Stack gap={1}>
           <FormControlLabel
-            control={<Checkbox />}
+            control={
+              <Checkbox
+                checked={crew}
+                onChange={(_, checked) => setCrew(checked)}
+              />
+            }
             label="Crew sleva (20%)"
-            value={crew}
-            onChange={(_, checked) => setCrew(checked)}
           />
 
           <Stack gap={2}>
@@ -207,6 +210,7 @@ export const BarMenu = () => {
                   crew ? 0.8 : 1
                 );
                 setPaymentState(undefined);
+                setCrew(false);
               }}
             >
               Odeslat
