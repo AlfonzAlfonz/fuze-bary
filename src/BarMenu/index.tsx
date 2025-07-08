@@ -46,7 +46,7 @@ export const BarMenu = () => {
     priceData.data && groupBy(Object.values(priceData.data), (x) => x.category);
 
   const [crew, setCrew] = useState(false);
-
+  console.log(crew);
   return (
     <>
       <Stack gap={2} sx={{ flexGrow: 1 }}>
