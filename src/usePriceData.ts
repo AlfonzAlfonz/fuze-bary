@@ -9,7 +9,7 @@ type TableRow = [
   never,
   never,
   never,
-  price: string
+  price: string,
 ];
 
 export const usePriceData = () => {
@@ -30,22 +30,16 @@ export const usePriceData = () => {
         return JSON.parse(persisted);
       }
 
-      const url =
-        "https://hoyebsvzsgwoiivmgvvb.supabase.co/storage/v1/object/data/ceny.csv";
+      const file = await fetch(
+        import.meta.env.VITE_INPUT_URL + `?t=${Date.now()}`,
+        {
+          headers: {
+            Authorization: `Bearer ${import.meta.env.VITE_AUTH_TOKEN}`,
+          },
+        }
+      ).then((r) => r.text());
 
-      const file = await fetch(url + `?t=${Date.now()}`, {
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_TOKEN}`,
-        },
-      })
-        .then((r) => ({ data: r, error: null }))
-        .catch((e) => ({ data: null, error: e }));
-
-      if (file.error) throw file.error;
-
-      const parsed = parse(await file.data!.text(), {
-        delimiter: ",",
-      }) as TableRow[];
+      const parsed = parse(file, { delimiter: "," }) as TableRow[];
 
       const result: [string, Item][] = [];
       let category: string = undefined!;
