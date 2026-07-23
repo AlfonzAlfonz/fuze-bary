@@ -23,7 +23,7 @@ export const Layout = ({
         </Button>
         <Drawer.Backdrop>
           <Drawer.Content placement="right">
-            <Drawer.Dialog>
+            <Drawer.Dialog className="py-0 px-0">
               <SidebarContent {...router} />
             </Drawer.Dialog>
           </Drawer.Content>

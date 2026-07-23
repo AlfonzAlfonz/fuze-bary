@@ -1,14 +1,15 @@
 import { Button } from "@heroui/react";
+import { Martini, NotebookTabs, Settings } from "lucide-react";
 import type { ReactNode } from "react";
 import type { RouterData } from "../App";
 import { Header } from "./Header";
-import { Martini, NotebookTabs, Settings } from "lucide-react";
+import { config } from "../config";
 
-export const SidebarContent = (props: RouterData) => {
+export const SidebarContent = (props: RouterData & { close?: () => void }) => {
   return (
     <div className="flex h-full flex-col justify-between gap-2">
       <div>
-        <Header>Fůůůze bary {/* TODO: Move to config.ts */}</Header>
+        <Header>{config.branding.name}</Header>
         <NavItem {...props} id="menu">
           <Martini /> Bar
         </NavItem>
@@ -38,6 +39,7 @@ const NavItem = ({
       variant={page === id ? "secondary" : "ghost"}
       className="justify-start py-6"
       size="lg"
+      slot={"close"}
     >
       {children}
     </Button>

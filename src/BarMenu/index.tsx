@@ -5,15 +5,19 @@ import {
   Drawer,
   ProgressBar,
   Typography,
+  useOverlayState,
 } from "@heroui/react";
 import { ErrorAlert } from "../ErrorAlert";
 import { Header } from "../Layout/Header";
 import { useApplication } from "../useApplication";
+import { formatPrice } from "../utils/price";
 import { OrderReview } from "./OrderReview";
 
 export const BarMenu = () => {
   const application = useApplication();
   const { priceData, colorIndexes, actions, order } = application;
+
+  const state = useOverlayState();
 
   const categorisedPriceData =
     priceData.data && groupBy(Object.values(priceData.data), (x) => x.category);
@@ -59,7 +63,7 @@ export const BarMenu = () => {
                           className="flex h-auto w-full flex-col items-start justify-between gap-1 whitespace-normal p-3 text-left text-black"
                         >
                           <span className="font-bold">{item.name}</span>
-                          <span>{item.price} Kč</span>
+                          <span>{formatPrice(item.price)}</span>
                         </Button>
                         {amount && (
                           <Badge
@@ -80,12 +84,17 @@ export const BarMenu = () => {
         </div>
 
         <Card className="block md:hidden sticky bottom-0">
-          <Drawer>
-            <Button fullWidth>Odeslat</Button>
+          <Drawer state={state}>
+            <Button fullWidth isDisabled={order.length === 0}>
+              Souhrn
+            </Button>
             <Drawer.Backdrop>
               <Drawer.Content placement="bottom">
-                <Drawer.Dialog className="overflow-scroll">
-                  <OrderReview application={application} />
+                <Drawer.Dialog className="overflow-scroll py-4 pb-10">
+                  <OrderReview
+                    application={application}
+                    close={() => state.close()}
+                  />
                 </Drawer.Dialog>
               </Drawer.Content>
             </Drawer.Backdrop>

@@ -11,10 +11,11 @@ import {
 } from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { useSnackbar } from "../Snackbars";
-import { useStore } from "../store/db";
 import { ErrorAlert } from "../ErrorAlert";
 import { Header } from "../Layout/Header";
+import { useSnackbar } from "../Snackbars";
+import { useStore } from "../store/db";
+import { formatPrice } from "../utils/price";
 
 export const BarTabs = () => {
   const store = useStore();
@@ -152,15 +153,17 @@ const TabDialog = ({
                           <Table.Cell />
                           <Table.Cell />
                           <Table.Cell>
-                            <strong>{sum} Kč</strong>
+                            <strong>{sum && formatPrice(sum)}</strong>
                           </Table.Cell>
                         </Table.Row>
                         {Object.values(itemSums ?? {}).map((t, i) => (
                           <Table.Row key={i}>
                             <Table.Cell>{t.name}</Table.Cell>
                             <Table.Cell>{t.amount}</Table.Cell>
-                            <Table.Cell>{t.price} Kč</Table.Cell>
-                            <Table.Cell>{t.amount * t.price} Kč</Table.Cell>
+                            <Table.Cell>{formatPrice(t.price)}</Table.Cell>
+                            <Table.Cell>
+                              {formatPrice(t.amount * t.price)}
+                            </Table.Cell>
                           </Table.Row>
                         ))}
                       </Table.Body>
@@ -184,8 +187,10 @@ const TabDialog = ({
                           <Table.Row key={i}>
                             <Table.Cell>{t.name}</Table.Cell>
                             <Table.Cell>{t.amount}</Table.Cell>
-                            <Table.Cell>{t.price * t.amount} Kč</Table.Cell>
                             <Table.Cell>
+                              {formatPrice(t.price * t.amount)}
+                            </Table.Cell>
+                            <Table.Cell className={"text-nowrap"}>
                               {new Date(t.createdAt).toLocaleString("cs")}
                             </Table.Cell>
                           </Table.Row>

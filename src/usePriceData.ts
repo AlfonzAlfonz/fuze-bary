@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { parse } from "csv-parse/browser/esm/sync";
 import slugify from "slugify";
+import { config } from "./config";
 import type { Item } from "./types";
 
 type TableRow = [
@@ -18,9 +19,9 @@ export const usePriceData = () => {
     networkMode: "always",
     gcTime: 0,
     queryFn: async (): Promise<Record<string, Item>> => {
-      const persisted = localStorage.getItem("ceny");
+      const persisted = localStorage.getItem(config.priceCacheKey);
 
-      const isOnline = await fetch("https://platform.signageos.io/ping", {
+      const isOnline = await fetch(config.onlinePingUrl, {
         method: "HEAD",
       })
         .then(() => true)
@@ -30,14 +31,11 @@ export const usePriceData = () => {
         return JSON.parse(persisted);
       }
 
-      const file = await fetch(
-        import.meta.env.VITE_INPUT_URL + `?t=${Date.now()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${import.meta.env.VITE_AUTH_TOKEN}`,
-          },
-        }
-      ).then((r) => r.text());
+      const file = await fetch(config.priceDataUrl + `?t=${Date.now()}`, {
+        headers: config.authToken
+          ? { Authorization: `Bearer ${config.authToken}` }
+          : undefined,
+      }).then((r) => r.text());
 
       const parsed = parse(file, { delimiter: "," }) as TableRow[];
 
@@ -68,7 +66,7 @@ export const usePriceData = () => {
 
       const ceny = Object.fromEntries(result);
 
-      localStorage.setItem("ceny", JSON.stringify(ceny));
+      localStorage.setItem(config.priceCacheKey, JSON.stringify(ceny));
 
       return ceny;
     },
@@ -76,7 +74,7 @@ export const usePriceData = () => {
 };
 
 const parsePrice = (v: string) => {
-  const n = v.replace(/ Kč$/, "");
+  const n = v.replace(new RegExp(` ${config.currency}$`), "");
   if (isFinite(Number(n))) {
     return Number(n);
   }

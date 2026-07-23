@@ -12,19 +12,27 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Minus } from "lucide-react";
 import { useState } from "react";
+import { config } from "../config";
 import { ErrorAlert } from "../ErrorAlert";
 import { Header } from "../Layout/Header";
 import { useStore } from "../store/db";
 import type { Application } from "../useApplication";
+import { formatPrice } from "../utils/price";
 
 type PaymentState =
-  ["cash"] | ["card"] | ["tab"] | ["tab", id: number] | undefined;
+  | ["cash"]
+  | ["card"]
+  | ["tab"]
+  | ["tab", id: number]
+  | undefined;
 
 interface Props {
   application: Application;
+  close?: () => void;
 }
 
 export const OrderReview = ({
+  close,
   application: { order, priceData, actions, orderSubmitting },
 }: Props) => {
   const store = useStore();
@@ -41,7 +49,7 @@ export const OrderReview = ({
   return (
     <>
       <div className="flex flex-col">
-        <Header>Objednávka</Header>
+        <Header>Souhrn</Header>
         <div className="flex flex-col gap-2 mx-2">
           {priceData.data &&
             order?.map((item, i) => (
@@ -73,24 +81,27 @@ export const OrderReview = ({
       </div>
 
       <div className="flex flex-col gap-4 m-4">
-        <Checkbox isSelected={crew} onChange={setCrew} variant="secondary">
-          <Checkbox.Content>
-            <Checkbox.Control>
-              <Checkbox.Indicator />
-            </Checkbox.Control>
-            Crew sleva (20%)
-          </Checkbox.Content>
-        </Checkbox>
+        {!!config.crewDiscount && (
+          <Checkbox isSelected={crew} onChange={setCrew} variant="secondary">
+            <Checkbox.Content>
+              <Checkbox.Control>
+                <Checkbox.Indicator />
+              </Checkbox.Control>
+              Crew sleva (20%)
+            </Checkbox.Content>
+          </Checkbox>
+        )}
 
         {!!order.length && (
           <div className="flex flex-row justify-between">
             <Typography type="h5">Celkem</Typography>
             <Typography type="h5">
-              {order.reduce(
-                (acc, x) => acc + priceData.data![x.itemId].price * x.amount,
-                0,
-              ) * (crew ? 0.8 : 1)}{" "}
-              Kč
+              {formatPrice(
+                order.reduce(
+                  (acc, x) => acc + priceData.data![x.itemId].price * x.amount,
+                  0,
+                ) * (crew ? 1 - config.crewDiscount : 1),
+              )}
             </Typography>
           </div>
         )}
@@ -103,20 +114,26 @@ export const OrderReview = ({
             setPaymentState(v ? ([v] as PaymentState) : undefined);
           }}
         >
-          <ToggleButton id="cash">Hotově</ToggleButton>
-          <ToggleButton id="card">
-            <ToggleButtonGroup.Separator />
-            Kartou
-          </ToggleButton>
-          <ToggleButton id="tab">
-            <ToggleButtonGroup.Separator />
-            {data &&
-            paymentState &&
-            paymentState[0] === "tab" &&
-            paymentState[1] !== undefined
-              ? data.find((t) => t.id === paymentState[1])?.name
-              : "Ůčet"}
-          </ToggleButton>
+          {config.paymentMethods.includes("cash") && (
+            <ToggleButton id="cash">Hotově</ToggleButton>
+          )}
+          {config.paymentMethods.includes("card") && (
+            <ToggleButton id="card">
+              <ToggleButtonGroup.Separator />
+              Kartou
+            </ToggleButton>
+          )}
+          {config.paymentMethods.includes("tab") && (
+            <ToggleButton id="tab">
+              <ToggleButtonGroup.Separator />
+              {data &&
+              paymentState &&
+              paymentState[0] === "tab" &&
+              paymentState[1] !== undefined
+                ? data.find((t) => t.id === paymentState[1])?.name
+                : "Ůčet"}
+            </ToggleButton>
+          )}
         </ToggleButtonGroup>
         <Button
           fullWidth
@@ -132,10 +149,11 @@ export const OrderReview = ({
               paymentState[0] === "tab"
                 ? `tab_${paymentState[1]!}`
                 : paymentState[0],
-              crew ? 0.8 : 1,
+              crew ? 1 - config.crewDiscount : 1,
             );
             setPaymentState(undefined);
             setCrew(false);
+            close?.();
           }}
         >
           Odeslat
