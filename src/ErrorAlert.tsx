@@ -1,7 +1,14 @@
-import Alert from "@mui/material/Alert";
+import { Alert } from "@heroui/react";
 
 export const ErrorAlert = ({ e }: { e: unknown }) => {
   return e ? (
-    <Alert severity="error">{e instanceof Error ? e.message : String(e)}</Alert>
+    <Alert status="danger">
+      <Alert.Indicator />
+      <Alert.Content>
+        <Alert.Description>
+          {e instanceof Error ? e.message : String(e)}
+        </Alert.Description>
+      </Alert.Content>
+    </Alert>
   ) : undefined;
 };

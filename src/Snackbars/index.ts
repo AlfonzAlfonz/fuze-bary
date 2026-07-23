@@ -1,24 +1,11 @@
-import { createContext, useContext } from "react";
-
-export type SnackbarState = [type: "success" | "error", message: string];
-
-export const SnackbarContext = createContext<
-  [
-    SnackbarState | undefined,
-    React.Dispatch<React.SetStateAction<SnackbarState | undefined>>
-  ]
->(null!);
+import { toast } from "@heroui/react";
 
 export const useSnackbar = () => {
-  const [state, setState] = useContext(SnackbarContext);
   return (type: "success" | "error", message: string) => {
-    if (state) {
-      setState(undefined);
-      setTimeout(() => {
-        setState([type, message]);
-      });
+    if (type === "error") {
+      toast.danger(message, { timeout: 60_000 });
     } else {
-      setState([type, message]);
+      toast.success(message, { timeout: 2000 });
     }
   };
 };

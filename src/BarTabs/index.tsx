@@ -1,22 +1,20 @@
-import CloseIcon from "@mui/icons-material/Close";
-import Button from "@mui/material/Button";
-import Container from "@mui/material/Container";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
-import IconButton from "@mui/material/IconButton";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+import {
+  Button,
+  Input,
+  Label,
+  ListBox,
+  Modal,
+  Table,
+  Tabs,
+  TextField,
+  Typography,
+} from "@heroui/react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useSnackbar } from "../Snackbars";
 import { useStore } from "../store/db";
 import { ErrorAlert } from "../ErrorAlert";
+import { Header } from "../Layout/Header";
 
 export const BarTabs = () => {
   const store = useStore();
@@ -30,7 +28,7 @@ export const BarTabs = () => {
   });
 
   return (
-    <Container>
+    <div className="mx-auto w-full max-w-4xl px-0 md:px-6">
       <TabDialog
         state={activeTab}
         name={data?.find((t) => t.id === activeTab)?.name}
@@ -44,35 +42,30 @@ export const BarTabs = () => {
           refetch();
         }}
       />
-      <Stack flexGrow={1} gap={2}>
-        <Stack
-          justifyContent="space-between"
-          direction="row"
-          alignItems="center"
-        >
-          <Typography variant="h4">Ůčty</Typography>
-          <Button onClick={() => setCreateDialog(true)}>Přidat</Button>
-        </Stack>
+      <div className="flex grow flex-col gap-4">
+        <Header className="justify-between pr-14">
+          <div>Ůčty</div>
+          <Button onPress={() => setCreateDialog(true)}>Přidat</Button>
+        </Header>
 
-        <List>
-          {data?.map((t) => (
-            <ListItem disablePadding>
-              <ListItemButton onClick={() => setActiveTab(t.id)}>
-                <Stack
-                  justifyContent="space-between"
-                  direction="row"
-                  flexGrow={1}
-                  alignItems="center"
-                >
-                  <Typography variant="body1">{t.name}</Typography>
-                  <Typography variant="body2">#{t.id}</Typography>
-                </Stack>
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </Stack>
-    </Container>
+        {data && (
+          <ListBox
+            aria-label="Ůčty"
+            selectionMode="none"
+            onAction={(key) => setActiveTab(Number(key))}
+          >
+            {data.map((t) => (
+              <ListBox.Item key={t.id} id={t.id} textValue={t.name}>
+                <div className="flex grow items-center justify-between">
+                  <Typography type="body">{t.name}</Typography>
+                  <Typography type="body-sm">#{t.id}</Typography>
+                </div>
+              </ListBox.Item>
+            ))}
+          </ListBox>
+        )}
+      </div>
+    </div>
   );
 };
 
@@ -97,49 +90,119 @@ const TabDialog = ({
   });
 
   const sum = data?.reduce((acc, x) => acc + x.amount * x.price, 0);
+  const itemSums = data?.reduce(
+    (acc, x) => ({
+      ...acc,
+      [x.itemId]: {
+        name: x.name,
+        amount: (acc[x.itemId]?.amount ?? 0) + x.amount,
+        price: (acc[x.itemId]?.price ?? 0) + x.price,
+      },
+    }),
+    {} as Record<string, { name: string; amount: number; price: number }>,
+  );
 
   return (
-    <Dialog onClose={onClose} open={state !== undefined}>
-      <DialogTitle>{name}</DialogTitle>
-      <IconButton
-        aria-label="close"
-        onClick={onClose}
-        sx={(theme) => ({
-          position: "absolute",
-          right: 8,
-          top: 8,
-          color: theme.palette.grey[500],
-        })}
-      >
-        <CloseIcon />
-      </IconButton>
-      <DialogContent sx={{ minWidth: "30vw" }}>
-        <Stack gap={2}>
-          <Typography variant="body1" fontWeight="bold">
-            Celkem: {sum} Kč
-          </Typography>
+    <Modal.Backdrop
+      isOpen={state !== undefined}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <Modal.Container size="cover">
+        <Modal.Dialog className={"max-w-3xl"}>
+          <Modal.CloseTrigger />
+          <Modal.Header>
+            <Modal.Heading>{name}</Modal.Heading>
+          </Modal.Header>
+
           <ErrorAlert e={error} />
-          <List sx={{ pt: 0 }}>
-            {data?.map((t) => (
-              <ListItem disablePadding key={t.id} dense>
-                <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  flexGrow={1}
-                >
-                  <Typography variant="body2">
-                    {t.amount} × {t.name}
-                  </Typography>
-                  <Typography variant="body2">
-                    {t.amount * t.price} Kč
-                  </Typography>
-                </Stack>
-              </ListItem>
-            ))}
-          </List>
-        </Stack>
-      </DialogContent>
-    </Dialog>
+
+          <Modal.Body className="flex flex-col">
+            <Tabs className="w-full grow">
+              <Tabs.ListContainer>
+                <Tabs.List aria-label="Options">
+                  <Tabs.Tab id="overview">
+                    Přehled
+                    <Tabs.Indicator />
+                  </Tabs.Tab>
+                  <Tabs.Tab id="analytics">
+                    Transakce
+                    <Tabs.Indicator />
+                  </Tabs.Tab>
+                </Tabs.List>
+              </Tabs.ListContainer>
+
+              <Tabs.Panel className="p-0 pt-2" id="overview">
+                <Table>
+                  <Table.ScrollContainer>
+                    <Table.Content>
+                      <Table.Header>
+                        <Table.Column isRowHeader>Položka</Table.Column>
+                        <Table.Column>Počet</Table.Column>
+                        <Table.Column>Cena</Table.Column>
+                        <Table.Column>Suma</Table.Column>
+                      </Table.Header>
+
+                      <Table.Body>
+                        <Table.Row key={"sum"}>
+                          <Table.Cell>
+                            <strong>Celkem</strong>
+                          </Table.Cell>
+                          <Table.Cell />
+                          <Table.Cell />
+                          <Table.Cell>
+                            <strong>{sum} Kč</strong>
+                          </Table.Cell>
+                        </Table.Row>
+                        {Object.values(itemSums ?? {}).map((t, i) => (
+                          <Table.Row key={i}>
+                            <Table.Cell>{t.name}</Table.Cell>
+                            <Table.Cell>{t.amount}</Table.Cell>
+                            <Table.Cell>{t.price} Kč</Table.Cell>
+                            <Table.Cell>{t.amount * t.price} Kč</Table.Cell>
+                          </Table.Row>
+                        ))}
+                      </Table.Body>
+                    </Table.Content>
+                  </Table.ScrollContainer>
+                </Table>
+              </Tabs.Panel>
+              <Tabs.Panel className="p-0 pt-2" id="analytics">
+                <Table>
+                  <Table.ScrollContainer>
+                    <Table.Content>
+                      <Table.Header>
+                        <Table.Column isRowHeader>Položka</Table.Column>
+                        <Table.Column>Počet</Table.Column>
+                        <Table.Column>Cena</Table.Column>
+                        <Table.Column>Datum vytvoření</Table.Column>
+                      </Table.Header>
+
+                      <Table.Body>
+                        {data?.map((t, i) => (
+                          <Table.Row key={i}>
+                            <Table.Cell>{t.name}</Table.Cell>
+                            <Table.Cell>{t.amount}</Table.Cell>
+                            <Table.Cell>{t.price * t.amount} Kč</Table.Cell>
+                            <Table.Cell>
+                              {new Date(t.createdAt).toLocaleString("cs")}
+                            </Table.Cell>
+                          </Table.Row>
+                        ))}
+                      </Table.Body>
+                    </Table.Content>
+                  </Table.ScrollContainer>
+                </Table>
+              </Tabs.Panel>
+              <Tabs.Panel className="pt-4" id="reports">
+                <p>Generate and download detailed reports.</p>
+              </Tabs.Panel>
+            </Tabs>
+          </Modal.Body>
+        </Modal.Dialog>
+      </Modal.Container>
+    </Modal.Backdrop>
   );
 };
 
@@ -159,26 +222,31 @@ const CreateTabDialog = ({
   const [loading, setLoading] = useState(false);
 
   return (
-    <Dialog onClose={onClose} open={open}>
-      <DialogTitle>Vytvořit ůčet</DialogTitle>
-
-      <DialogContent>
-        <Stack gap={1}>
-          <Typography color="red" variant="body1">
-            Zákaz vytváření účtů! Účty může vytvořit jen Denis
-          </Typography>
-          <TextField
-            label="Jméno"
-            variant="standard"
-            size="small"
-            onChange={(e) => setValue(e.target.value)}
-            value={value}
-            fullWidth
-          />
-          <DialogActions>
-            <Button onClick={onClose}>Cancel</Button>
+    <Modal.Backdrop
+      isOpen={open}
+      onOpenChange={(o) => {
+        if (!o) onClose();
+      }}
+    >
+      <Modal.Container>
+        <Modal.Dialog>
+          <Modal.CloseTrigger />
+          <Modal.Header>
+            <Modal.Heading>Vytvořit ůčet</Modal.Heading>
+          </Modal.Header>
+          <Modal.Body>
+            <TextField value={value} onChange={setValue}>
+              <Label>Jméno</Label>
+              <Input variant="secondary" />
+            </TextField>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onPress={onClose}>
+              Cancel
+            </Button>
             <Button
-              onClick={async () => {
+              isDisabled={loading}
+              onPress={async () => {
                 if (!confirm("Opravdu???")) {
                   onClose();
                   return;
@@ -190,20 +258,19 @@ const CreateTabDialog = ({
                 } catch (e) {
                   openSnackbar(
                     "error",
-                    e instanceof Error ? e.message : String(e)
+                    e instanceof Error ? e.message : String(e),
                   );
                 } finally {
                   setLoading(false);
                   onCreate();
                 }
               }}
-              disabled={loading}
             >
               Vytvořit
             </Button>
-          </DialogActions>
-        </Stack>
-      </DialogContent>
-    </Dialog>
+          </Modal.Footer>
+        </Modal.Dialog>
+      </Modal.Container>
+    </Modal.Backdrop>
   );
 };

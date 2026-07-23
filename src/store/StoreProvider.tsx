@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { createStore, StoreContext, type Store } from "./db";
-import CircularProgress from "@mui/material/CircularProgress";
+import { Spinner } from "@heroui/react";
 
 export const StoreProvider = ({ children }: { children: ReactNode }) => {
   const [store, setStore] = useState<Store>(null!);
@@ -14,6 +14,6 @@ export const StoreProvider = ({ children }: { children: ReactNode }) => {
   return store ? (
     <StoreContext value={store}>{children}</StoreContext>
   ) : (
-    <CircularProgress />
+    <Spinner />
   );
 };

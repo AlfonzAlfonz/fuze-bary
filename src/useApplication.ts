@@ -4,6 +4,8 @@ import { usePriceData } from "./usePriceData";
 import { useSnackbar } from "./Snackbars";
 import { useStore } from "./store/db";
 
+export type Application = ReturnType<typeof useApplication>;
+
 export const useApplication = () => {
   const openSnackbar = useSnackbar();
 
@@ -16,7 +18,7 @@ export const useApplication = () => {
       priceData.data && [
         ...new Set(Object.values(priceData.data).map((d) => d.category)),
       ],
-    [priceData.data]
+    [priceData.data],
   );
 
   const [order, setOrder] = useState<OrderItem[]>([]);
@@ -34,7 +36,7 @@ export const useApplication = () => {
         setOrder((s) => {
           if (s.some((itm) => itm.itemId === id)) {
             return s.map((itm) =>
-              itm.itemId === id ? { ...itm, amount: itm.amount + 1 } : itm
+              itm.itemId === id ? { ...itm, amount: itm.amount + 1 } : itm,
             );
           } else {
             return [...s, { itemId: id, amount: 1 }];
@@ -44,13 +46,13 @@ export const useApplication = () => {
         setOrder((s) =>
           s
             .map((itm) =>
-              itm.itemId === id ? { ...itm, amount: itm.amount - 1 } : itm
+              itm.itemId === id ? { ...itm, amount: itm.amount - 1 } : itm,
             )
-            .filter((itm) => itm.amount)
+            .filter((itm) => itm.amount),
         ),
       submitOrder: async (
         method: "cash" | "card" | `tab_${number}`,
-        multiplier: number
+        multiplier: number,
       ) => {
         const now = new Date().toISOString();
 
@@ -68,7 +70,7 @@ export const useApplication = () => {
                 method,
                 multiplier,
               };
-            })
+            }),
           );
           setOrder([]);
           openSnackbar("success", "Ůloženo");

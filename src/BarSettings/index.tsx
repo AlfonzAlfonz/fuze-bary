@@ -1,47 +1,49 @@
-import Button from "@mui/material/Button";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import Container from "@mui/material/Container";
-import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
+import {
+  Button,
+  Card,
+  Input,
+  Label,
+  TextField,
+  Typography,
+} from "@heroui/react";
 import { useStore, type Store } from "../store/db";
 import { stringify } from "csv-stringify/browser/esm/sync";
+import { Header } from "../Layout/Header";
 
 export const BarSettings = () => {
   const store = useStore();
 
   return (
-    <Container>
-      <Stack gap={2}>
-        <Typography variant="h4">Nastavení</Typography>
+    <div className="mx-auto w-full max-w-4xl px-0 md:px-6">
+      <Header>Nastavení</Header>
+      <div className="flex flex-col gap-4">
         <Card>
-          <CardContent>
-            <Stack gap={2}>
-              <Typography variant="h5">Exportovat data</Typography>
-              <Button
-                sx={{ alignSelf: "flex-start" }}
-                onClick={() => exportData(store)}
-              >
+          <Card.Content>
+            <div className="flex flex-col gap-4">
+              <Typography type="h5">Exportovat data</Typography>
+              <Button className="self-start" onPress={() => exportData(store)}>
                 Exportovat
               </Button>
-            </Stack>
-          </CardContent>
+            </div>
+          </Card.Content>
         </Card>
 
         <Card>
-          <CardContent>
-            <Stack gap={2}>
-              <Typography variant="h5">Epocha</Typography>
+          <Card.Content>
+            <div className="flex flex-col gap-4">
+              <Typography type="h5">Epocha</Typography>
 
-              <TextField label="Epocha" size="small" />
+              <TextField>
+                <Label>Epocha</Label>
+                <Input />
+              </TextField>
 
-              <Button sx={{ alignSelf: "flex-start" }}>Uložit</Button>
-            </Stack>
-          </CardContent>
+              <Button className="self-start">Uložit</Button>
+            </div>
+          </Card.Content>
         </Card>
-      </Stack>
-    </Container>
+      </div>
+    </div>
   );
 };
 

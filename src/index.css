@@ -1,0 +1,10 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --accent: #A463EE;
+  --radius: 0.0625rem;
+  --field-radius: 0.0625rem;
+}
