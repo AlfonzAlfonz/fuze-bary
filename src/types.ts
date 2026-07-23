@@ -18,6 +18,7 @@ export type Transaction = {
   price: number;
   createdAt: string;
   method: "cash" | "card" | `tab_${number}`;
+  multiplier: number;
 };
 
 export type Tab = {

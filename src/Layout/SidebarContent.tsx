@@ -1,5 +1,5 @@
 import { Button } from "@heroui/react";
-import { Martini, NotebookTabs, Settings } from "lucide-react";
+import { History, Martini, NotebookTabs, Settings } from "lucide-react";
 import type { ReactNode } from "react";
 import type { RouterData } from "../App";
 import { Header } from "./Header";
@@ -16,6 +16,10 @@ export const SidebarContent = (props: RouterData & { close?: () => void }) => {
         <NavItem {...props} id="tabs">
           <NotebookTabs />
           Účty
+        </NavItem>
+        <NavItem {...props} id="transactions">
+          <History />
+          Historie
         </NavItem>
       </div>
       <NavItem {...props} id="settings">

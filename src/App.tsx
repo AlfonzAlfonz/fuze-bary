@@ -3,10 +3,13 @@ import { BarMenu } from "./BarMenu";
 import { BarSettings } from "./BarSettings";
 import { BarTabs } from "./BarTabs";
 import { Layout } from "./Layout";
+import { Transactions } from "./Transactions";
 
 export interface RouterData {
-  page: "menu" | "tabs" | "settings";
-  setPage: Dispatch<SetStateAction<"menu" | "tabs" | "settings">>;
+  page: "menu" | "tabs" | "transactions" | "settings";
+  setPage: Dispatch<
+    SetStateAction<"menu" | "tabs" | "transactions" | "settings">
+  >;
 }
 
 function App() {
@@ -16,6 +19,7 @@ function App() {
     <Layout page={page} setPage={setPage}>
       {page === "menu" && <BarMenu />}
       {page === "tabs" && <BarTabs />}
+      {page === "transactions" && <Transactions />}
       {page === "settings" && <BarSettings />}
     </Layout>
   );
